@@ -1,7 +1,6 @@
 function readBytes(bytePointer, length) {
     // Buffer is an object supplied by the module object
     const b = new Uint8ClampedArray(buffer, bytePointer, length);
-    console.log(b);
     return b;
 }
 

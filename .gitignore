@@ -1,9 +1,0 @@
-# Created by .ignore support plugin (hsz.mobi)
-
-.idea/
-cmake-build-debug/
-react-wasm/package-lock.json
-react-wasm/package.json
-react-wasm/public/
-react-wasm/src/
-react-wasm/tsconfig.json
