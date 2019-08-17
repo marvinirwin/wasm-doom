@@ -531,15 +531,11 @@ WritePCXfile
 char canvasBytes[sizeof(char) * 4 * SCREENHEIGHT * SCREENWIDTH];
 
 void initCanvas() {
-    EM_ASM_({
-                    initByteLocation($0, $1);
-
-            }, canvasBytes, sizeof(char) * SCREENWIDTH * SCREENHEIGHT * 4);
+    EM_ASM_({ initByteLocation($0, $1);}, canvasBytes, sizeof(char) * SCREENWIDTH * SCREENHEIGHT * 4);
 }
 // char namebuf[9];
 
 void DrawScreen(const byte *linear) {
-    printf("%d\n", &canvasBytes);
     // First group all pixels by their color, in an array of linked lists
     // size_t drawableColorCount = (sizeof(drawableColors) / sizeof(XColor));
     // Node ** colorLists = malloc(drawableColorCount * sizeof(Node**));
@@ -554,8 +550,6 @@ void DrawScreen(const byte *linear) {
     // I guess I could guarantee with malloc and free
     for (int y = 0; y < SCREENHEIGHT; y++) {
         for (int x = 0; x < SCREENWIDTH; x ++) {
-
-
             // Get the position of the pixel on the screen
             int pos = (y * SCREENWIDTH) + x;
             // Get what color that pixel is

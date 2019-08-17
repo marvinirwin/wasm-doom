@@ -181,6 +181,7 @@ void W_AddFile (char *filename)
 	fileinfo = &singleinfo;
 	singleinfo.filepos = 0;
 	singleinfo.size = LONG(filelength(handle));
+	printf("%s size: %d\n", filename, singleinfo.size);
 	ExtractFileBase (filename, singleinfo.name);
 	numlumps++;
     }

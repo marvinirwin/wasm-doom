@@ -3,6 +3,12 @@ function readBytes(bytePointer, length) {
     const b = new Uint8ClampedArray(buffer, bytePointer, length);
     return b;
 }
+function initByteLocation(bytePointer, length) {
+    setTimeout(() => {
+        const b = readBytes(bytePointer, length);
+        console.log(b);
+    }, 1000);
+}
 
 var __ffmpegjs_utf8ToStr;
 
