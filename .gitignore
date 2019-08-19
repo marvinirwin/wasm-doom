@@ -1,0 +1,13 @@
+# Created by .ignore support plugin (hsz.mobi)
+
+.idea/
+cmake-build-debug/
+react-wasm/package-lock.json
+/cmake_install.cmake
+/CMakeCache.txt
+/wasm-doom.wasm
+/wasm-doom.js
+/Makefile
+/CMakeFiles
+/src/DOOM/*.o
+
