@@ -1,1 +1,0 @@
-/emsdk_portable/sdk/emcc -s ERROR_ON_UNDEFINED_SYMBOLS=0 -D_DEBUG   @CMakeFiles/wasm-doom.dir/objects1.rsp  -o wasm-doom.js @CMakeFiles/wasm-doom.dir/linklibs.rsp

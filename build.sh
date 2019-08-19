@@ -3,8 +3,6 @@ export EMMAKEN_CFLAGS="-s ERROR_ON_UNDEFINED_SYMBOLS=0"
 WASM_FILENAME=wasm-doom.wasm
 JS_FILENAME=react-wasm/src/wasm/wasm-doom.js
 
-
-# TODO, figure out how to build with cmake, for now I'll just use CLion
 sudo docker run --rm -v $(pwd):/src trzeci/emscripten emconfigure cmake .
 sudo docker run --rm -v $(pwd):/src trzeci/emscripten emmake  make
 
@@ -92,5 +90,5 @@ gsed -i.old '2s;^;\// @ts-ignore;' ${JS_FILENAME}
 gsed -i.old "s|$WASM_FILENAME|/$WASM_FILENAME|" ${JS_FILENAME}
 gsed -i.old "s|wasmBinaryFile = locateFile|// wasmBinaryFile = locateFile|" ${JS_FILENAME}
 mv react-wasm/src/wasm/${WASM_FILENAME} react-wasm/public/${WASM_FILENAME}
-mv ./doom1.wad react-wasm/public/doom1.wad
+cp ./doom1.wad react-wasm/public/doom1.wad
 

@@ -255,14 +255,14 @@ void D_ProcessEvents(void) {
     event_t * keyev = malloc(sizeof(event_t));
     keyev->type = ev_keydown;
 
-#ifdef NO_CURSES
+/*#ifdef NO_CURSES
     cPrintf("Give me character please\n");
     int ch = getchar();
     keyev->data1 = ch;
 #else
     int ch = getch();
     keyev->data1 = ch;
-#endif
+#endif*/
 
     // IF STORE DEMO, DO NOT ACCEPT INPUT
     if ((gamemode == commercial)
@@ -276,12 +276,12 @@ void D_ProcessEvents(void) {
         G_Responder(ev);
     }
 
-#ifndef NO_CURSES
+/*#ifndef NO_CURSES
     if (ch != ERR) {
         enterKeyDownStruct(ch);
     }
     clearKeyDownStruct();
-#endif
+#endif*/
 }
 
 

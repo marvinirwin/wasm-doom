@@ -36,10 +36,12 @@ static const char rcsid[] = "$Id: m_misc.c,v 1.6 1997/02/03 22:45:10 b1 Exp $";
 #include <unistd.h>
 
 #include <ctype.h>
-#ifndef NO_CURSES
-    #include <curses.h>
-#endif
 
+#ifndef NO_CURSES
+
+#include <curses.h>
+
+#endif
 
 
 #include "doomdef.h"
@@ -78,8 +80,8 @@ char lookupChar(double greyscale) {
 }
 
 XColor drawableColors[] = {
-        {0, 0,          0, 0},
-        {0, UINT16_MAX, 0, 0},
+        {0, 0,          0,          0},
+        {0, UINT16_MAX, 0,          0},
         {0, 0,          UINT16_MAX},
         {0, 0,          0,          UINT16_MAX},
         {0, UINT16_MAX, UINT16_MAX},
@@ -286,22 +288,22 @@ default_t defaults[] =
 
 
 #ifdef NORMALUNIX
-/*    {"key_right",&key_right, KEY_RIGHTARROW},
-    {"key_left",&key_left, KEY_LEFTARROW},
-    {"key_up",&key_up, KEY_UPARROW},
-    {"key_down",&key_down, KEY_DOWNARROW},*/
-                {"key_strafeleft", &key_strafeleft, ','},
-                {"key_straferight", &key_straferight, '.'},
+        /*    {"key_right",&key_right, KEY_RIGHTARROW},
+            {"key_left",&key_left, KEY_LEFTARROW},
+            {"key_up",&key_up, KEY_UPARROW},
+            {"key_down",&key_down, KEY_DOWNARROW},*/
+                        {"key_strafeleft", &key_strafeleft, ','},
+                        {"key_straferight", &key_straferight, '.'},
 
-/*    {"key_fire",&key_fire, 'e'},*/
-                {"key_use", &key_use, ' '},
-                {"key_strafe", &key_strafe, KEY_RALT},
-                {"key_speed", &key_speed, KEY_RSHIFT},
+        /*    {"key_fire",&key_fire, 'e'},*/
+                        {"key_use", &key_use, ' '},
+                        {"key_strafe", &key_strafe, KEY_RALT},
+                        {"key_speed", &key_speed, KEY_RSHIFT},
 
-// UNIX hack, to be removed. 
+        // UNIX hack, to be removed.
 #ifdef SNDSERV
-                {"sndserver", (int *) &sndserver_filename, (int) "sndserver"},
-                {"mb_used", &mb_used, 2},
+                        {"sndserver", (int *) &sndserver_filename, (int) "sndserver"},
+                        {"mb_used", &mb_used, 2},
 #endif
 
 #endif
@@ -496,11 +498,11 @@ WritePCXfile
     pcx->ymax = SHORT(height - 1);
     pcx->hres = SHORT(width);
     pcx->vres = SHORT(height);
-    memset (pcx->palette, 0, sizeof(pcx->palette));
+    memset(pcx->palette, 0, sizeof(pcx->palette));
     pcx->color_planes = 1;        // chunky image
     pcx->bytes_per_line = SHORT(width);
     pcx->palette_type = SHORT(2);    // not a grey scale
-    memset (pcx->filler, 0, sizeof(pcx->filler));
+    memset(pcx->filler, 0, sizeof(pcx->filler));
 
 
     // pack the image
@@ -528,43 +530,32 @@ WritePCXfile
 }
 
 
-char canvasBytes[sizeof(char) * 4 * SCREENHEIGHT * SCREENWIDTH];
+char * canvasBytes = 0;
 
 void initCanvas() {
-    EM_ASM_({ initByteLocation($0, $1);}, canvasBytes, sizeof(char) * SCREENWIDTH * SCREENHEIGHT * 4);
+    canvasBytes = malloc(sizeof(char) * 4 * SCREENHEIGHT * SCREENWIDTH);
+    EM_ASM_({initByteLocation($0, $1);}, canvasBytes, sizeof(char) * SCREENWIDTH * SCREENHEIGHT * 4);
 }
 // char namebuf[9];
 
 void DrawScreen(const byte *linear) {
-    // First group all pixels by their color, in an array of linked lists
-    // size_t drawableColorCount = (sizeof(drawableColors) / sizeof(XColor));
-    // Node ** colorLists = malloc(drawableColorCount * sizeof(Node**));
-/*    for (int j = 0; j < drawableColorCount; ++j) {
-        colorLists[j] = NULL;
+/*    if (canvasBytes == 0) {
     }*/
-/*#ifdef  WASM*/
-    // char charList[] = ".-`',:_;~\"/!|\\i^trc*v?s()+lj1=e{[]z}<xo7f>aJy3Iun542b6Lw9k#dghq80VpT$YACSFPUZ%mEGXNO&DKBR@HQWM";
-/*#endif*/
-    // Are these stacks cleared after the loop ends?
-    // I don't know if it will keep the DrawChars created in the middle
-    // I guess I could guarantee with malloc and free
     for (int y = 0; y < SCREENHEIGHT; y++) {
-        for (int x = 0; x < SCREENWIDTH; x ++) {
+        for (int x = 0; x < SCREENWIDTH; x++) {
             // Get the position of the pixel on the screen
-            int pos = (y * SCREENWIDTH) + x;
+            int pos = ((y * SCREENWIDTH) + x);
             // Get what color that pixel is
             XColor palColor = gamePalette[linear[pos]];
 /*#ifdef WASM*/
-            int wasmIndex = y * SCREENHEIGHT + x;
-            canvasBytes[wasmIndex + 0] = palColor.red / MAXSHORT * 255;
-            canvasBytes[wasmIndex + 1] = palColor.green / MAXSHORT * 255;
-            canvasBytes[wasmIndex + 2] = palColor.blue / MAXSHORT * 255;
-            canvasBytes[wasmIndex + 3] = 'Z'; // alpha
+            int wasmIndex = ((y * SCREENWIDTH) + x) * 4;
+            canvasBytes[wasmIndex + 0] =  palColor.red / (255);
+            canvasBytes[wasmIndex + 1] =  palColor.green / ( 255);
+            canvasBytes[wasmIndex + 2] =  palColor.blue / ( 255);
+            canvasBytes[wasmIndex + 3] = 255; // alpha
         }
-/*#ifdef WASM*/
-/*#endif*/
-        // If curses is off then I will insert a line break to move printf down one y
     }
+    // printf("canvas address: %d\n",);
     emscripten_sleep(1000);
 }
 

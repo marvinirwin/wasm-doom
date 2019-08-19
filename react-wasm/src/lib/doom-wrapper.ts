@@ -2,7 +2,6 @@ import DOOM from '../wasm/wasm-doom';
 import {buffer, filter, map, reduce, scan} from "rxjs/operators";
 import {Subject} from "rxjs";
 
-
 const stdOut$: Subject<number> = new Subject();
 const stdErr$: Subject<number> = new Subject();
 const stdOutFinished$ = stdOut$.pipe(filter(a => a === 10));
@@ -46,11 +45,29 @@ export async function run() {
     ];
     // ["-i", inFilename, /*'--resize', '300x300',*/ "-o", outfilename];
     const resp = await (await fetch('/doom1.wad')).arrayBuffer();
-    debugger;
     const a = new Uint8Array(resp);
     // @ts-ignore
     Module.MEMFS = [{name: 'doom1.wad', data: a}];
-    wasmInstance = DOOM(Module);
+    // @ts-ignore
+    Module.render = (buffer, bytePointer, length) => {
+        let width = 320;
+        let height = 200;
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        document.body.appendChild(canvas);
+        setInterval(() => {
+            let screenBytes = new Uint8ClampedArray(buffer, bytePointer, length);
+            const ctx = canvas.getContext('2d');
+            if (ctx) {
+                const imageData = ctx.createImageData(width, height);
+                imageData.data.set(screenBytes);
+                ctx.putImageData(imageData, 0, 0);
+                console.log('finished rendering DOM');
+            }
+        }, 500);
+    };
+    DOOM(Module);
 }
 
 

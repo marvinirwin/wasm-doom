@@ -4,10 +4,11 @@ function readBytes(bytePointer, length) {
     return b;
 }
 function initByteLocation(bytePointer, length) {
-    setTimeout(() => {
+    Module.render();
+/*    setInterval(() => {
         const b = readBytes(bytePointer, length);
         console.log(b);
-    }, 1000);
+    }, 1000);*/
 }
 
 var __ffmpegjs_utf8ToStr;
