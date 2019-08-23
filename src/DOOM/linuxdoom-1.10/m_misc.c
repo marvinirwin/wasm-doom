@@ -531,10 +531,29 @@ WritePCXfile
 
 
 char * canvasBytes = 0;
+extern event_t event;
+boolean consumed;
 
 void initCanvas() {
     canvasBytes = malloc(sizeof(char) * 4 * SCREENHEIGHT * SCREENWIDTH);
-    EM_ASM_({initByteLocation($0, $1);}, canvasBytes, sizeof(char) * SCREENWIDTH * SCREENHEIGHT * 4);
+    EM_ASM_({
+        initByteLocation(
+            $0,
+            $1,
+            $2,
+            $3,
+            $4,
+            $5,
+            $6);
+        },
+                canvasBytes,
+                sizeof(char) * SCREENWIDTH * SCREENHEIGHT * 4,
+                &event.type,
+                &event.data1,
+                &event.data2,
+                &event.data3,
+                &consumed
+                );
 }
 // char namebuf[9];
 
@@ -549,9 +568,9 @@ void DrawScreen(const byte *linear) {
             XColor palColor = gamePalette[linear[pos]];
 /*#ifdef WASM*/
             int wasmIndex = ((y * SCREENWIDTH) + x) * 4;
-            canvasBytes[wasmIndex + 0] =  palColor.red / (255);
-            canvasBytes[wasmIndex + 1] =  palColor.green / ( 255);
-            canvasBytes[wasmIndex + 2] =  palColor.blue / ( 255);
+            canvasBytes[wasmIndex + 0] =  palColor.red / 255;
+            canvasBytes[wasmIndex + 1] =  palColor.green /  255;
+            canvasBytes[wasmIndex + 2] =  palColor.blue /  255;
             canvasBytes[wasmIndex + 3] = 255; // alpha
         }
     }

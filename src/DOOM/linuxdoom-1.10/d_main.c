@@ -155,7 +155,42 @@ event_t events[MAXEVENTS];
 int eventhead;
 int eventtail;
 
+// Javascript will put events here
+event_t event = {};
+boolean consumed = 0;
 
+void CheckForEvent() {
+    /*
+    typedef enum
+    {
+        ev_keydown,
+        ev_keyup,
+        ev_mouse,
+        ev_joystick
+    } evtype_t;
+    */
+    /*
+     {
+        evtype_t	type;
+        int		data1;		// keys / mouse/joystick buttons
+        int		data2;		// mouse/joystick x move
+        int		data3;		// mouse/joystick y move
+    } event_t;
+    */
+    if (event.type) {
+        event_t * e = malloc(sizeof(event_t));
+        e->type = event.type;
+        e->data1 = event.data1;
+        e->data2 = event.data2;
+        e->data3 = event.data3;
+        D_PostEvent(e);
+        event.type = 0;
+        event.data1 = 0;
+        event.data2 = 0;
+        event.data3 = 0;
+        consumed = 0;
+    }
+}
 //
 // D_PostEvent
 // Called by the I/O functions when input is detected
