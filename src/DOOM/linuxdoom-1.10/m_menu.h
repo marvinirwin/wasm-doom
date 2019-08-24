@@ -38,6 +38,7 @@
 boolean M_Responder (event_t *ev);
 
 
+
 // Called by main loop,
 // only used for menu (skull cursor) animation.
 void M_Ticker (void);

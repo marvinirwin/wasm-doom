@@ -157,7 +157,7 @@ int eventtail;
 
 // Javascript will put events here
 event_t event = {};
-boolean consumed = 0;
+boolean consumed = 1;
 
 void CheckForEvent() {
     /*
@@ -178,6 +178,7 @@ void CheckForEvent() {
     } event_t;
     */
     if (event.type) {
+        printf("Found event type %d, data1: %d\n", event.type, event.data1);
         event_t * e = malloc(sizeof(event_t));
         e->type = event.type;
         e->data1 = event.data1;
@@ -188,7 +189,7 @@ void CheckForEvent() {
         event.data1 = 0;
         event.data2 = 0;
         event.data3 = 0;
-        consumed = 0;
+        consumed = 1;
     }
 }
 //
@@ -214,70 +215,6 @@ struct keyDownStruct {
     clock_t start;
     int key;
 };
-// Can only have 10 keys down at once
-struct keyDownStruct keyDownList[10] = {
-        {.start = 0,  .key = -1},
-        {.start = 0,  .key = -1},
-        {.start = 0,  .key = -1},
-        {.start = 0,  .key = -1},
-        {.start = 0,  .key = -1},
-        {.start = 0,  .key = -1},
-        {.start = 0,  .key = -1},
-        {.start = 0,  .key = -1},
-        {.start = 0,  .key = -1},
-        {.start = 0,  .key = -1},
-};
-
-void clearKeyDownStruct() {
-    clock_t t = clock();
-    for (int i = 0; i < 9; ++i) {
-        struct keyDownStruct* s = &keyDownList[i];
-        if (s->key == -1) {
-            continue;
-        }
-/*        char str[500];
-        sprintf(str, "diff %ld", t - s->start);*/
-        cPrintf("diff %ld \n", t - s->start);
-/*        cPrintf("diff %ld", t - s->start);*/
-        if (t - s->start >= KEYDOWN_LIMIT) {
-            cPrintf("Pressing %d up", s->key);
-            event_t * e = malloc(sizeof(event_t));
-            e->type = ev_keyup;
-            e->data1 = s->key;
-            respond(e);
-            s->key = -1;
-            s->start = 0;
-        }
-    }
-}
-
-void enterKeyDownStruct(int c) {
-    clock_t t = clock();
-    // First try, try to find duplicate key
-    for (int i = 0; i < sizeof(keyDownList) / sizeof(struct keyDownStruct); ++i) {
-        struct keyDownStruct* s = &keyDownList[i];
-        if (s->key == c) {
-            cPrintf("Holding %d down", c);
-            s->start = t;
-            return;
-        }
-    }
-    // Second try, try and find an empty one
-    for (int i = 0; i < sizeof(keyDownList) / sizeof(struct keyDownStruct); ++i) {
-        struct keyDownStruct* s = &keyDownList[i];
-        if (s->key == -1) {
-            cPrintf("Pressing %d down", c);
-            s->key = c;
-            s->start = t;
-            event_t * e = malloc(sizeof(event_t));
-            e->type = ev_keydown;
-            e->data1 = s->key;
-            respond(e);
-            return;
-        }
-    }
-    cPrintf("No room in the keydown list for key %d", 1,  c);
-}
 
 
 //
@@ -519,6 +456,7 @@ void D_DoomLoop(void) {
 
         // Update display, next frame, with current state.
         D_Display();
+        CheckForEvent();
 
 #ifndef SNDSERV
         // Sound mixing for the buffer is snychronous.

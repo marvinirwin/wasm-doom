@@ -253,7 +253,7 @@ typedef enum
 #define KEY_DOWNARROW 115
 #define KEY_ESCAPE	27
 // Was 13, is now 113 (q) because terminal didn't like.
-#define KEY_ENTER	113
+#define KEY_ENTER	13
 #define KEY_TAB		9
 #define KEY_F1		(0x80+0x3b)
 #define KEY_F2		(0x80+0x3c)

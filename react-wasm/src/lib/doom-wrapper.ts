@@ -89,8 +89,8 @@ export async function run() {
         setInterval(() => {
             if (!eventQue.length) return;
             // I suppose I should have access to the wasm memory object which uses getvalue
-            const eventFree = getValue(Number(p_consumed), 'i8');
-            if (!eventFree) return;
+            const consumed = getValue(Number(p_consumed), 'i8');
+            if (!consumed) return;
 
             const ev: event | undefined = eventQue.shift();
             if (!ev) return;
@@ -99,15 +99,14 @@ export async function run() {
             setValue(p_data1, data1);
             setValue(p_data2, data2 || 0);
             setValue(p_data3, data3 || 0);
-            setValue(p_consumed, 1);
+            setValue(p_consumed, 0);
         }, 100);
         window.onkeydown = ((e: KeyboardEvent) => {
-            debugger;
             let items = {
                 // I assume 1 is ev_keydown
                 type: 1,
                 // Will this be an integer?
-                data1: parseInt(e.charCode, 10),
+                data1: e.keyCode,
                 data2: undefined,
                 data3: undefined
             };
@@ -118,7 +117,7 @@ export async function run() {
                 // I assume 2 is ev_keydown
                 type: 2,
                 // Will this be an integer?
-                data1: parseInt(e.charCode, 10),
+                data1: e.keyCode,
                 data2: undefined,
                 data3: undefined
             };

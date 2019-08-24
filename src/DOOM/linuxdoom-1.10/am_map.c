@@ -614,6 +614,7 @@ boolean
 AM_Responder
 ( event_t*	ev )
 {
+    printf("M_Responder\n");
 
     int rc;
     static int cheatstate=0;

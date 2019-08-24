@@ -14,7 +14,6 @@ function initByteLocation(
 ) {
 
     Module.eventLoop(
-        buffer,
         p_type,
         p_data1,
         p_data2,
