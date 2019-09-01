@@ -568,14 +568,13 @@ void DrawScreen(const byte *linear) {
             XColor palColor = gamePalette[linear[pos]];
 /*#ifdef WASM*/
             int wasmIndex = ((y * SCREENWIDTH) + x) * 4;
-            canvasBytes[wasmIndex + 0] =  palColor.red / 255;
-            canvasBytes[wasmIndex + 1] =  palColor.green /  255;
-            canvasBytes[wasmIndex + 2] =  palColor.blue /  255;
+            canvasBytes[wasmIndex + 0] =  palColor.red / 256;
+            canvasBytes[wasmIndex + 1] =  palColor.green /  256;
+            canvasBytes[wasmIndex + 2] =  palColor.blue /  256;
             canvasBytes[wasmIndex + 3] = 255; // alpha
         }
     }
     // printf("canvas address: %d\n",);
-    emscripten_sleep(1000);
 }
 
 

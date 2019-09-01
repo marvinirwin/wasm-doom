@@ -48,6 +48,7 @@ static const char rcsid[] = "$Id: d_main.c,v 1.8 1997/02/03 22:45:09 b1 Exp $";
 #include <sys/time.h>
 
 #endif
+#include <emscripten.h>
 
 
 #include <time.h>
@@ -159,24 +160,24 @@ int eventtail;
 event_t event = {};
 boolean consumed = 1;
 
+/*
+typedef enum
+{
+    ev_keydown,
+    ev_keyup,
+    ev_mouse,
+    ev_joystick
+} evtype_t;
+*/
+/*
+ {
+    evtype_t	type;
+    int		data1;		// keys / mouse/joystick buttons
+    int		data2;		// mouse/joystick x move
+    int		data3;		// mouse/joystick y move
+} event_t;
+*/
 void CheckForEvent() {
-    /*
-    typedef enum
-    {
-        ev_keydown,
-        ev_keyup,
-        ev_mouse,
-        ev_joystick
-    } evtype_t;
-    */
-    /*
-     {
-        evtype_t	type;
-        int		data1;		// keys / mouse/joystick buttons
-        int		data2;		// mouse/joystick x move
-        int		data3;		// mouse/joystick y move
-    } event_t;
-    */
     if (event.type) {
         printf("Found event type %d, data1: %d\n", event.type, event.data1);
         event_t * e = malloc(sizeof(event_t));
@@ -191,6 +192,29 @@ void CheckForEvent() {
         event.data3 = 0;
         consumed = 1;
     }
+}
+#include <emscripten.h>
+#include <emscripten/html5.h>
+
+EM_BOOL key_callback(int eventType, const EmscriptenKeyboardEvent *e, void *userData)
+{
+    if (eventType == EMSCRIPTEN_EVENT_KEYDOWN || eventType == EMSCRIPTEN_EVENT_KEYUP) {
+        event_t * ev = malloc(sizeof(event_t));
+        // One is keydown in DOOM land
+
+        ev->data1 = e->charCode;
+        ev->data2 = 0;
+        ev->data3 = 0;
+        if (eventType == EMSCRIPTEN_EVENT_KEYDOWN ) {
+            ev->type = 1;
+        }
+        if (eventType == EMSCRIPTEN_EVENT_KEYUP) {
+            ev->type = 2;
+        }
+        printf("Found event type %d, data1: %d\n", ev->type, ev->data1);
+    }
+    return 1;
+
 }
 //
 // D_PostEvent
@@ -456,7 +480,9 @@ void D_DoomLoop(void) {
 
         // Update display, next frame, with current state.
         D_Display();
+        emscripten_sleep(0);
         CheckForEvent();
+
 
 #ifndef SNDSERV
         // Sound mixing for the buffer is snychronous.

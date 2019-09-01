@@ -1,5 +1,6 @@
 import DOOM from '../wasm/wasm-doom';
 import {buffer, filter, map} from "rxjs/operators";
+import {merge, Observable} from "rxjs";
 import {Subject} from "rxjs";
 
 const stdOut$: Subject<number> = new Subject();
@@ -10,13 +11,19 @@ export const bufferedStdOut$ = stdOut$.pipe(buffer(stdOutFinished$), map(byteArr
     const v = byteArray.map(c => String.fromCharCode(c)).join('');
     return v;
 }));
+const manualMessage$: Subject<string> = new Subject();
 export const bufferedStdErr$ = stdErr$.pipe(buffer(stdErrFinished$), map(byteArray => {
     const v = byteArray.map(c => String.fromCharCode(c)).join('');
     return v;
 }));
+export const allMessages: Observable<string> = merge(
+    bufferedStdOut$,
+    bufferedStdErr$,
+    manualMessage$
+);
 
-bufferedStdOut$.subscribe(v => console.log(v));
-bufferedStdErr$.subscribe(v => console.warn(v));
+/*bufferedStdOut$.subscribe(v => console.log(v));
+bufferedStdErr$.subscribe(v => console.warn(v));*/
 
 export function bytesToBase64(b: Uint8Array): Promise<string> {
     return new Promise((resolve, reject) => {
@@ -38,6 +45,8 @@ export async function run() {
     const Module = {};
     // @ts-ignore
     Module.stderr = v => stdErr$.next(v);
+    // @ts-ignore
+    Module.stdout = v => stdOut$.next(v);
     // Module.stdin = stdin(e.encode(`-i ${inFilename} --rotate-90 > ${outfilename}`));
     // @ts-ignore
     Module.arguments = [
@@ -53,8 +62,13 @@ export async function run() {
         let width = 320;
         let height = 200;
         const canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
+        // canvas. = 'height: 100%; width: 100%;';
+
+/*        canvas.width = width;
+        canvas.height = height;*/
+        canvas.style.height = '100%';
+        canvas.style.width = '100%';
+
         document.body.appendChild(canvas);
         setInterval(() => {
             let screenBytes = new Uint8ClampedArray(buffer, bytePointer, length);
@@ -67,7 +81,7 @@ export async function run() {
             }
             // Oh yeah I have no idea how to write bytes from javascript to wasm
             // Probably that wasmMemory thing
-        }, 500);
+        }, 1);
     };
     interface event {
         type: number;
@@ -110,6 +124,7 @@ export async function run() {
                 data2: undefined,
                 data3: undefined
             };
+            manualMessage$.next(JSON.stringify(items));
             eventQue.push(items);
         });
         window.onkeyup = ((e: KeyboardEvent) => {
@@ -121,11 +136,16 @@ export async function run() {
                 data2: undefined,
                 data3: undefined
             };
+            manualMessage$.next(JSON.stringify(items));
             eventQue.push(items);
         });
     };
 
     const execution = DOOM(Module);
+    return {
+        bufferedStdOut$,
+        bufferedStdErr$
+    }
 }
 
 
