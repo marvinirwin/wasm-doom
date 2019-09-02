@@ -86,7 +86,6 @@ static const char rcsid[] = "$Id: d_main.c,v 1.8 1997/02/03 22:45:09 b1 Exp $";
 #include "p_setup.h"
 #include "r_local.h"
 
-
 #include "d_main.h"
 #include "debug.h"
 
@@ -178,7 +177,7 @@ typedef enum
 } event_t;
 */
 void CheckForEvent() {
-    if (event.type) {
+    if (event.type != 255) {
         printf("Found event type %d, data1: %d\n", event.type, event.data1);
         event_t * e = malloc(sizeof(event_t));
         e->type = event.type;
@@ -186,7 +185,7 @@ void CheckForEvent() {
         e->data2 = event.data2;
         e->data3 = event.data3;
         D_PostEvent(e);
-        event.type = 0;
+        event.type = 255;
         event.data1 = 0;
         event.data2 = 0;
         event.data3 = 0;
@@ -196,7 +195,7 @@ void CheckForEvent() {
 #include <emscripten.h>
 #include <emscripten/html5.h>
 
-EM_BOOL key_callback(int eventType, const EmscriptenKeyboardEvent *e, void *userData)
+/*EM_BOOL key_callback(int eventType, const EmscriptenKeyboardEvent *e, void *userData)
 {
     if (eventType == EMSCRIPTEN_EVENT_KEYDOWN || eventType == EMSCRIPTEN_EVENT_KEYUP) {
         event_t * ev = malloc(sizeof(event_t));
@@ -211,11 +210,11 @@ EM_BOOL key_callback(int eventType, const EmscriptenKeyboardEvent *e, void *user
         if (eventType == EMSCRIPTEN_EVENT_KEYUP) {
             ev->type = 2;
         }
-        printf("Found event type %d, data1: %d\n", ev->type, ev->data1);
+        // printf("Found event type %d, data1: %d\n", ev->type, ev->data1);
     }
     return 1;
 
-}
+}*/
 //
 // D_PostEvent
 // Called by the I/O functions when input is detected
@@ -444,6 +443,8 @@ void D_Display(void) {
 //
 extern boolean demorecording;
 
+extern int TicCount;
+
 void D_DoomLoop(void) {
     if (demorecording)
         G_BeginRecording();
@@ -493,6 +494,11 @@ void D_DoomLoop(void) {
         // Update sound output.
         I_SubmitSound();
 #endif
+        if (TicCount > 60) {
+            TicCount = 0;
+        } else {
+            TicCount++;
+        }
     }
 }
 

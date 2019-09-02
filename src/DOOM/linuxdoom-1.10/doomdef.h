@@ -247,10 +247,11 @@ typedef enum
 // This is the stuff configured by Setup.Exe.
 // Most key data are simple ascii (uppercased).
 //
-#define KEY_RIGHTARROW	100
-#define KEY_LEFTARROW	97
-#define KEY_UPARROW	119
-#define KEY_DOWNARROW 115
+// I changed these to keycodes I got from javascript
+#define KEY_RIGHTARROW	39
+#define KEY_LEFTARROW	37
+#define KEY_UPARROW	38
+#define KEY_DOWNARROW 40
 #define KEY_ESCAPE	27
 // Was 13, is now 113 (q) because terminal didn't like.
 #define KEY_ENTER	13

@@ -1,5 +1,5 @@
 import DOOM from '../wasm/wasm-doom';
-import {buffer, filter, map} from "rxjs/operators";
+import {buffer, filter, map, bufferTime} from "rxjs/operators";
 import {merge, Observable} from "rxjs";
 import {Subject} from "rxjs";
 
@@ -19,8 +19,13 @@ export const bufferedStdErr$ = stdErr$.pipe(buffer(stdErrFinished$), map(byteArr
 export const allMessages: Observable<string> = merge(
     bufferedStdOut$,
     bufferedStdErr$,
-    manualMessage$
-);
+    manualMessage$)
+    .pipe(
+        bufferTime(500),
+        filter(a => !!a.length),
+        map(v => v.filter(s => s).join('\n')),
+        filter(s => !!s.length)
+    );
 
 /*bufferedStdOut$.subscribe(v => console.log(v));
 bufferedStdErr$.subscribe(v => console.warn(v));*/
@@ -77,7 +82,6 @@ export async function run() {
                 const imageData = ctx.createImageData(width, height);
                 imageData.data.set(screenBytes);
                 ctx.putImageData(imageData, 0, 0);
-                console.log('finished rendering DOM');
             }
             // Oh yeah I have no idea how to write bytes from javascript to wasm
             // Probably that wasmMemory thing
@@ -118,34 +122,30 @@ export async function run() {
         window.onkeydown = ((e: KeyboardEvent) => {
             let items = {
                 // I assume 1 is ev_keydown
+                type: 0,
+                // Will this be an integer?
+                data1: e.keyCode,
+                data2: undefined,
+                data3: undefined
+            };
+            // manualMessage$.next(JSON.stringify(items));
+            eventQue.push(items);
+        });
+        window.onkeyup = ((e: KeyboardEvent) => {
+            let items = {
+                // I assume 2 is ev_keydown
                 type: 1,
                 // Will this be an integer?
                 data1: e.keyCode,
                 data2: undefined,
                 data3: undefined
             };
-            manualMessage$.next(JSON.stringify(items));
-            eventQue.push(items);
-        });
-        window.onkeyup = ((e: KeyboardEvent) => {
-            let items = {
-                // I assume 2 is ev_keydown
-                type: 2,
-                // Will this be an integer?
-                data1: e.keyCode,
-                data2: undefined,
-                data3: undefined
-            };
-            manualMessage$.next(JSON.stringify(items));
+            // manualMessage$.next(JSON.stringify(items));
             eventQue.push(items);
         });
     };
 
     const execution = DOOM(Module);
-    return {
-        bufferedStdOut$,
-        bufferedStdErr$
-    }
 }
 
 

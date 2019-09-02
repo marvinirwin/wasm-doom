@@ -6,7 +6,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 
-allMessages.subscribe(s => toast(s, {autoClose: 2500}));
+allMessages.subscribe(s => toast(s, {autoClose: 5000}));
 
 run();
 

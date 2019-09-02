@@ -75,6 +75,12 @@ static const char
 #define SAVESTRINGSIZE    24
 
 
+int TicCount = 0;
+
+boolean isPrintTic(void) {
+    return TicCount == 0;
+};
+
 boolean G_CheckDemoStatus(void);
 
 void G_ReadDemoTiccmd(ticcmd_t *cmd);
@@ -262,9 +268,16 @@ void G_BuildTiccmd(ticcmd_t *cmd) {
 
     strafe = gamekeydown[key_strafe] || mousebuttons[mousebstrafe]
              || joybuttons[joybstrafe];
-    speed = gamekeydown[key_speed] || joybuttons[joybspeed];
 
-    cPrintf("%d", key_down);
+    speed = gamekeydown[key_speed] || joybuttons[joybspeed];
+/*    if (isPrintTic()) {
+        printf("strafe: %d speed: %d keydown: %d, mousedown: %d joybutton: %d \n",
+               strafe, speed, gamekeydown[key_strafe],
+               mousebuttons[mousebstrafe],
+               joybuttons[joybstrafe]
+        );
+    }*/
+
     if (strafe) {
         cPrintf("strafing");
     }
@@ -302,6 +315,18 @@ void G_BuildTiccmd(ticcmd_t *cmd) {
         tspeed = speed;
 
     // let movement keys cancel each other out
+/*    if (isPrintTic()) {
+        printf(""
+               "ev_keydown: %d"
+               "ev_keyup: %d"
+               "ev_mouse: %d"
+               "ev_joystick: %d\n",
+               ev_keydown,
+               ev_keyup,
+               ev_mouse,
+               ev_joystick
+        );
+    }*/
     if (strafe) {
         if (gamekeydown[key_right]) {
             // fprintf(stderr, "strafe right\n");
@@ -326,6 +351,9 @@ void G_BuildTiccmd(ticcmd_t *cmd) {
         if (joyxmove < 0)
             cmd->angleturn += angleturn[tspeed];
     }
+/*    if (isPrintTic()) {
+        printf("beforegamekeydown forwardmove: %d sidemove: %d\n", forward, side);
+    }*/
 
     if (gamekeydown[key_up]) {
         // fprintf(stderr, "up\n");
@@ -344,8 +372,19 @@ void G_BuildTiccmd(ticcmd_t *cmd) {
     if (gamekeydown[key_strafeleft])
         side -= sidemove[speed];
 
+
     // buttons
     cmd->chatchar = HU_dequeueChatChar();
+    if (isPrintTic()) {
+/*        printf("gamekeydown[key_fire]: %d "
+               "mousebuttons[mousebfire]: %d "
+               "joybuttons[mousebfire]: %d"
+               "\n",
+                gamekeydown[key_fire],
+                mousebuttons[mousebfire],
+                joybuttons[mousebfire]
+                );*/
+    }
 
     if (gamekeydown[key_fire] || mousebuttons[mousebfire]
         || joybuttons[joybfire])
@@ -365,10 +404,24 @@ void G_BuildTiccmd(ticcmd_t *cmd) {
             break;
         }
 
-    // mouse
-    if (mousebuttons[mousebforward])
-        forward += forwardmove[speed];
+/*    if (isPrintTic()) {
+        printf("beforemouse forwardmove: %d sidemove: %d\n", forward, side);
+    }*/
 
+    // mouse
+/*    if (mousebuttons[mousebforward]) {
+        if (isPrintTic()) {
+            printf("inside mouse buttons before: %d sidemove: %d\n", forward, side);
+        }
+        forward += forwardmove[speed];
+        if (isPrintTic()) {
+            printf("inside mouse buttons end: %d sidemove: %d\n", forward, side);
+        }
+    }*/
+
+/*    if (isPrintTic()) {
+        printf("beforemousebuttons forwardmove: %d sidemove: %d\n", forward, side);
+    }*/
     // forward double click
     if (mousebuttons[mousebforward] != dclickstate && dclicktime > 1) {
         dclickstate = mousebuttons[mousebforward];
@@ -386,6 +439,9 @@ void G_BuildTiccmd(ticcmd_t *cmd) {
             dclickstate = 0;
         }
     }
+/*    if (isPrintTic()) {
+        printf("beforebstrafe forwardmove: %d sidemove: %d\n", forward, side);
+    }*/
 
     // strafe double click
     bstrafe =
@@ -407,6 +463,9 @@ void G_BuildTiccmd(ticcmd_t *cmd) {
             dclickstate2 = 0;
         }
     }
+/*    if (isPrintTic()) {
+        printf("beforestrafe forwardmove: %d sidemove: %d\n", forward, side);
+    }*/
 
     forward += mousey;
     if (strafe)
@@ -414,8 +473,12 @@ void G_BuildTiccmd(ticcmd_t *cmd) {
     else
         cmd->angleturn -= mousex * 0x8;
 
+
     mousex = mousey = 0;
 
+/*    if (isPrintTic()) {
+        printf("before maxplmove forwardmove: %d sidemove: %d\n", forward, side);
+    }*/
     if (forward > MAXPLMOVE)
         forward = MAXPLMOVE;
     else if (forward < -MAXPLMOVE)
@@ -427,6 +490,10 @@ void G_BuildTiccmd(ticcmd_t *cmd) {
 
     cmd->forwardmove += forward;
     cmd->sidemove += side;
+
+/*    if (isPrintTic()) {
+        printf("nearend forwardmove: %d sidemove: %d\n", forward, side);
+    }*/
 
     // special buttons
     if (sendpause) {
@@ -502,7 +569,7 @@ void G_DoLoadLevel(void) {
 // Get info needed to make ticcmd_ts for the players.
 // 
 boolean G_Responder(event_t *ev) {
-    printf("G_Responder\n");
+    // printf("G_Responder\n");
     // allow spy mode changes even during the demo
     if (gamestate == GS_LEVEL && ev->type == ev_keydown
         && ev->data1 == KEY_F12 && (singledemo || !deathmatch)) {
@@ -552,6 +619,7 @@ boolean G_Responder(event_t *ev) {
     switch (ev->type) {
         case ev_keydown:
             if (ev->data1 == KEY_PAUSE) {
+/*                printf("Key down %d\n", ev->data1);*/
                 sendpause = true;
                 return true;
             }
@@ -561,10 +629,12 @@ boolean G_Responder(event_t *ev) {
 
         case ev_keyup:
             if (ev->data1 < NUMKEYS)
+/*                printf("Key up %d\n", ev->data1);*/
                 gamekeydown[ev->data1] = false;
             return false;   // always let key up events filter down
 
         case ev_mouse:
+            printf("ev_mouse: %d %d %d %d\n", ev->type, ev->data1, ev->data2, ev->data3);
             mousebuttons[0] = ev->data1 & 1;
             mousebuttons[1] = ev->data1 & 2;
             mousebuttons[2] = ev->data1 & 4;
