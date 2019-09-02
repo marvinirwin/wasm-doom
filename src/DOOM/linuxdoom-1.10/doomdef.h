@@ -248,10 +248,10 @@ typedef enum
 // Most key data are simple ascii (uppercased).
 //
 // I changed these to keycodes I got from javascript
-#define KEY_RIGHTARROW	39
-#define KEY_LEFTARROW	37
-#define KEY_UPARROW	38
-#define KEY_DOWNARROW 40
+#define KEY_RIGHTARROW 68
+#define KEY_LEFTARROW	65
+#define KEY_UPARROW	87
+#define KEY_DOWNARROW 83
 #define KEY_ESCAPE	27
 // Was 13, is now 113 (q) because terminal didn't like.
 #define KEY_ENTER	13

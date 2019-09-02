@@ -69,10 +69,10 @@ export async function run() {
         const canvas = document.createElement('canvas');
         // canvas. = 'height: 100%; width: 100%;';
 
-/*        canvas.width = width;
-        canvas.height = height;*/
-        canvas.style.height = '100%';
-        canvas.style.width = '100%';
+        canvas.width = width;
+        canvas.height = height;
+/*        canvas.style.height = '100%';
+        canvas.style.width = '100%';*/
 
         document.body.appendChild(canvas);
         setInterval(() => {
@@ -118,35 +118,68 @@ export async function run() {
             setValue(p_data2, data2 || 0);
             setValue(p_data3, data3 || 0);
             setValue(p_consumed, 0);
-        }, 100);
+        }, 1);
         window.onkeydown = ((e: KeyboardEvent) => {
             let items = {
-                // I assume 1 is ev_keydown
                 type: 0,
-                // Will this be an integer?
                 data1: e.keyCode,
                 data2: undefined,
                 data3: undefined
             };
             // manualMessage$.next(JSON.stringify(items));
             eventQue.push(items);
+            e.preventDefault();
         });
         window.onkeyup = ((e: KeyboardEvent) => {
             let items = {
-                // I assume 2 is ev_keydown
                 type: 1,
-                // Will this be an integer?
                 data1: e.keyCode,
                 data2: undefined,
                 data3: undefined
             };
             // manualMessage$.next(JSON.stringify(items));
             eventQue.push(items);
+            e.preventDefault();
         });
+        window.onmousedown = ((e: MouseEvent) => {
+            // The 0 key is currently the fire button
+            /*
+            mousebuttons[0] = ev->data1 & 1;
+            mousebuttons[1] = ev->data1 & 2;
+            mousebuttons[2] = ev->data1 & 4;
+            mousex = ev->data2 * (mouseSensitivity + 5) / 10;
+            mousey = ev->data3 * (mouseSensitivity + 5) / 10;
+             */
+            eventQue.push({
+                type: 2,
+                data1: 1,
+                data2: undefined,
+                data3: undefined
+            })
+            e.preventDefault();
+        });
+        window.onmouseup = ((e: MouseEvent) => {
+            // The 0 key is currently the fire button
+            /*
+            mousebuttons[0] = ev->data1 & 1;
+            mousebuttons[1] = ev->data1 & 2;
+            mousebuttons[2] = ev->data1 & 4;
+            mousex = ev->data2 * (mouseSensitivity + 5) / 10;
+            mousey = ev->data3 * (mouseSensitivity + 5) / 10;
+             */
+            eventQue.push({
+                type: 2,
+                data1: 0,
+                data2: undefined,
+                data3: undefined
+            })
+            e.preventDefault();
+        });
+
     };
 
     const execution = DOOM(Module);
-}
+};
 
 
 

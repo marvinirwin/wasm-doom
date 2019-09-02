@@ -178,7 +178,7 @@ typedef enum
 */
 void CheckForEvent() {
     if (event.type != 255) {
-        printf("Found event type %d, data1: %d\n", event.type, event.data1);
+        // printf("Found event type %d, data1: %d\n", event.type, event.data1);
         event_t * e = malloc(sizeof(event_t));
         e->type = event.type;
         e->data1 = event.data1;
