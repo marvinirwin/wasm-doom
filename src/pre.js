@@ -1,8 +1,32 @@
 function readBytes(bytePointer, length) {
     // Buffer is an object supplied by the module object
     const b = new Uint8ClampedArray(buffer, bytePointer, length);
-    console.log(b);
     return b;
+}
+function initByteLocation(
+    p_pixels,
+    l_pixels,
+    p_type,
+    p_data1,
+    p_data2,
+    p_data3,
+    p_consumed
+) {
+
+    Module.eventLoop(
+        p_type,
+        p_data1,
+        p_data2,
+        p_data3,
+        p_consumed,
+        setValue,
+        getValue
+    );
+    Module.render(buffer, p_pixels, l_pixels);
+/*    setInterval(() => {
+        const b = readBytes(bytePointer, length);
+        console.log(b);
+    }, 1000);*/
 }
 
 var __ffmpegjs_utf8ToStr;

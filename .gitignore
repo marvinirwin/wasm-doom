@@ -3,7 +3,11 @@
 .idea/
 cmake-build-debug/
 react-wasm/package-lock.json
-react-wasm/package.json
-react-wasm/public/
-react-wasm/src/
-react-wasm/tsconfig.json
+/cmake_install.cmake
+/CMakeCache.txt
+/wasm-doom.wasm
+/wasm-doom.js
+/Makefile
+/CMakeFiles
+/src/DOOM/*.o
+
